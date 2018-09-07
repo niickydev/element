@@ -27,7 +27,7 @@
         :type="type"
         :disabled="inputDisabled"
         :readonly="readonly"
-        :autocomplete="autoComplete || autocomplete"
+        :autocomplete="autoComplete"
         :value="currentValue"
         ref="input"
         @compositionstart="handleComposition"
@@ -129,8 +129,7 @@
         textareaCalcStyle: {},
         hovering: false,
         focused: false,
-        isOnComposition: false,
-        valueBeforeComposition: null
+        isOnComposition: false
       };
     },
 
@@ -149,18 +148,9 @@
         type: [Boolean, Object],
         default: false
       },
-      autocomplete: {
-        type: String,
-        default: 'off'
-      },
-      /** @Deprecated in next major version */
       autoComplete: {
         type: String,
-        validator(val) {
-          process.env.NODE_ENV !== 'production' &&
-            console.warn('[Element Warn][Input]\'auto-complete\' property will be deprecated in next major version. please use \'autocomplete\' instead.');
-          return true;
-        }
+        default: 'off'
       },
       validateEvent: {
         type: Boolean,
@@ -267,16 +257,10 @@
       handleComposition(event) {
         if (event.type === 'compositionend') {
           this.isOnComposition = false;
-          this.currentValue = this.valueBeforeComposition;
-          this.valueBeforeComposition = null;
-          this.handleInput(event);
         } else {
           const text = event.target.value;
           const lastCharacter = text[text.length - 1] || '';
           this.isOnComposition = !isKorean(lastCharacter);
-          if (this.isOnComposition && event.type === 'compositionstart') {
-            this.valueBeforeComposition = text;
-          }
         }
       },
       handleInput(event) {
